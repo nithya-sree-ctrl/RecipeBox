@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RecipeBox - Personal Recipe & Meal Planner</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <div class="logo">🍴 RecipeBox</div>
+
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#recipes">Recipes</a>
+        <a href="#ingredients">Ingredients</a>
+        <a href="#users">Users</a>
+        <a href="#mealplans">Meal Planner</a>
+    </nav>
+</header>
+
+
+<!-- HOME -->
+
+<section id="home" class="hero">
+
+    <div class="hero-content">
+
+        <h1>Welcome to RecipeBox</h1>
+
+        <p>
+            Organize your favorite recipes, ingredients,
+            users and daily meal plans in one place.
+        </p>
+
+        <a href="#recipes" class="button">
+            Explore Recipes
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- RECIPES -->
+
+<section id="recipes" class="section">
+
+    <h2>🍲 Recipes</h2>
+
+    <div class="form-card">
+
+        <h3>Add New Recipe</h3>
+
+        <input type="text" id="recipeName"
+               placeholder="Recipe Name">
+
+        <input type="text" id="recipeCuisine"
+               placeholder="Cuisine">
+
+        <input type="number" id="recipePrepTime"
+               placeholder="Preparation Time (minutes)">
+
+        <textarea id="recipeSteps"
+                  placeholder="Cooking Steps"></textarea>
+
+        <label>
+            <input type="checkbox" id="recipeFavourite">
+            Favourite Recipe
+        </label>
+
+        <button onclick="addRecipe()">
+            Add Recipe
+        </button>
+
+    </div>
+
+    <div class="data-card">
+
+        <h3>Saved Recipes</h3>
+
+        <button onclick="loadRecipes()">
+            Refresh Recipes
+        </button>
+
+        <div id="recipeList"></div>
+
+    </div>
+
+</section>
+
+
+<!-- INGREDIENTS -->
+
+<section id="ingredients" class="section">
+
+    <h2>🥕 Ingredients</h2>
+
+    <div class="form-card">
+
+        <h3>Add Ingredient</h3>
+
+        <input type="text" id="ingredientName"
+               placeholder="Ingredient Name">
+
+        <input type="text" id="ingredientQuantity"
+               placeholder="Quantity">
+
+        <button onclick="addIngredient()">
+            Add Ingredient
+        </button>
+
+    </div>
+
+    <div class="data-card">
+
+        <h3>Saved Ingredients</h3>
+
+        <button onclick="loadIngredients()">
+            Refresh Ingredients
+        </button>
+
+        <div id="ingredientList"></div>
+
+    </div>
+
+</section>
+
+
+<!-- USERS -->
+
+<section id="users" class="section">
+
+    <h2>👤 Users</h2>
+
+    <div class="form-card">
+
+        <h3>Add User</h3>
+
+        <input type="text" id="userName"
+               placeholder="User Name">
+
+        <input type="email" id="userEmail"
+               placeholder="Email">
+
+        <button onclick="addUser()">
+            Add User
+        </button>
+
+    </div>
+
+    <div class="data-card">
+
+        <h3>Registered Users</h3>
+
+        <button onclick="loadUsers()">
+            Refresh Users
+        </button>
+
+        <div id="userList"></div>
+
+    </div>
+
+</section>
+
+
+<!-- MEAL PLANNER -->
+
+<section id="mealplans" class="section">
+
+    <h2>📅 Meal Planner</h2>
+
+    <div class="form-card">
+
+        <h3>Create Meal Plan</h3>
+
+        <input type="number" id="mealUserId"
+               placeholder="User ID">
+
+        <input type="number" id="mealRecipeId"
+               placeholder="Recipe ID">
+
+        <input type="date" id="mealDate">
+
+        <button onclick="addMealPlan()">
+            Add Meal Plan
+        </button>
+
+    </div>
+
+    <div class="data-card">
+
+        <h3>Planned Meals</h3>
+
+        <button onclick="loadMealPlans()">
+            Refresh Meal Plans
+        </button>
+
+        <div id="mealPlanList"></div>
+
+    </div>
+
+</section>
+
+
+<footer>
+
+    <p>© 2026 RecipeBox | Personal Recipe & Meal Planner</p>
+
+</footer>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
