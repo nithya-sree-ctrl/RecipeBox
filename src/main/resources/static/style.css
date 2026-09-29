@@ -276,3 +276,12 @@ footer {
         padding: 50px 5%;
     }
 }
+/* Button click effect */
+button {
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+button:active {
+    background-color: #8b4513;
+    transform: scale(0.97);
+}

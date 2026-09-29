@@ -1,387 +1,571 @@
-const API = "";
-
-
-/* =========================
-   RECIPES
-========================= */
+// ======================================================
+// RECIPE
+// ======================================================
 
 async function addRecipe() {
 
     const recipe = {
-
         name: document.getElementById("recipeName").value,
-
         cuisine: document.getElementById("recipeCuisine").value,
-
-        prepTime: Number(
-            document.getElementById("recipePrepTime").value
-        ),
-
+        prepTime: Number(document.getElementById("recipePrepTime").value),
         steps: document.getElementById("recipeSteps").value,
-
-        favourite:
-            document.getElementById("recipeFavourite").checked
+        favourite: document.getElementById("recipeFavourite").checked
     };
 
-    const response = await fetch(API + "/recipes", {
+    try {
 
-        method: "POST",
+        const response = await fetch("/recipes", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(recipe)
+        });
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+        if (response.ok) {
 
-        body: JSON.stringify(recipe)
-    });
+            // Clear form
+            document.getElementById("recipeName").value = "";
+            document.getElementById("recipeCuisine").value = "";
+            document.getElementById("recipePrepTime").value = "";
+            document.getElementById("recipeSteps").value = "";
+            document.getElementById("recipeFavourite").checked = false;
 
-    if (response.ok) {
+            // Refresh list
+            loadRecipes();
 
-        alert("Recipe added successfully!");
+        } else {
+            console.error("Failed to add recipe.");
+        }
 
-        document.getElementById("recipeName").value = "";
-        document.getElementById("recipeCuisine").value = "";
-        document.getElementById("recipePrepTime").value = "";
-        document.getElementById("recipeSteps").value = "";
-
-        loadRecipes();
-
-    } else {
-
-        alert("Failed to add recipe.");
+    } catch (error) {
+        console.error("Error adding recipe:", error);
     }
 }
 
 
 async function loadRecipes() {
 
-    const response = await fetch(API + "/recipes");
-
-    const recipes = await response.json();
-
     const list = document.getElementById("recipeList");
 
-    list.innerHTML = "";
+    // Immediately clear old data
+    list.innerHTML = "<p>Refreshing...</p>";
 
-    recipes.forEach(recipe => {
+    try {
 
-        list.innerHTML += `
+        const response = await fetch("/recipes?time=" + Date.now());
 
-            <div class="item">
+        if (!response.ok) {
+            throw new Error("Unable to load recipes");
+        }
 
-                <h4>${recipe.name}</h4>
+        const recipes = await response.json();
 
-                <p><b>ID:</b> ${recipe.id}</p>
+        list.innerHTML = "";
 
-                <p><b>Cuisine:</b> ${recipe.cuisine}</p>
+        if (recipes.length === 0) {
+            list.innerHTML = "<p>No recipes found.</p>";
+            return;
+        }
 
-                <p><b>Preparation:</b>
-                    ${recipe.prepTime} minutes
-                </p>
+        recipes.forEach(recipe => {
 
-                <p><b>Steps:</b>
-                    ${recipe.steps}
-                </p>
+            list.innerHTML += `
+                <div class="item">
 
-                <p><b>Favourite:</b>
-                    ${recipe.favourite ? "Yes ⭐" : "No"}
-                </p>
+                    <h4>${recipe.name}</h4>
 
-                <button
-                    class="delete-btn"
-                    onclick="deleteRecipe(${recipe.id})">
-                    Delete
-                </button>
+                    <p>
+                        <b>ID:</b> ${recipe.id}
+                    </p>
 
-            </div>
-        `;
-    });
+                    <p>
+                        <b>Cuisine:</b> ${recipe.cuisine}
+                    </p>
+
+                    <p>
+                        <b>Preparation:</b> ${recipe.prepTime} minutes
+                    </p>
+
+                    <p>
+                        <b>Steps:</b> ${recipe.steps}
+                    </p>
+
+                    <p>
+                        <b>Favourite:</b>
+                        ${recipe.favourite ? "Yes ⭐" : "No"}
+                    </p>
+
+                    <button
+                        class="delete-btn"
+                        onclick="deleteRecipe(${recipe.id})">
+                        Delete
+                    </button>
+
+                </div>
+            `;
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        list.innerHTML =
+            "<p>Unable to refresh recipes.</p>";
+    }
 }
 
 
 async function deleteRecipe(id) {
 
-    await fetch(API + "/recipes/" + id, {
+    try {
 
-        method: "DELETE"
-    });
+        const response = await fetch("/recipes/" + id, {
+            method: "DELETE"
+        });
 
-    loadRecipes();
+        if (response.ok) {
+            loadRecipes();
+        }
+
+    } catch (error) {
+
+        console.error("Error deleting recipe:", error);
+
+    }
 }
 
 
-/* =========================
-   INGREDIENTS
-========================= */
+// ======================================================
+// INGREDIENT
+// ======================================================
 
 async function addIngredient() {
 
     const ingredient = {
-
         name: document.getElementById("ingredientName").value,
-
-        quantity:
-            document.getElementById("ingredientQuantity").value
+        quantity: document.getElementById("ingredientQuantity").value
     };
 
-    const response = await fetch(API + "/ingredients", {
+    try {
 
-        method: "POST",
+        const response = await fetch("/ingredients", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(ingredient)
+        });
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+        if (response.ok) {
 
-        body: JSON.stringify(ingredient)
-    });
+            // Clear form
+            document.getElementById("ingredientName").value = "";
+            document.getElementById("ingredientQuantity").value = "";
 
-    if (response.ok) {
+            // Refresh list
+            loadIngredients();
 
-        alert("Ingredient added successfully!");
+        } else {
+            console.error("Failed to add ingredient.");
+        }
 
-        document.getElementById("ingredientName").value = "";
-        document.getElementById("ingredientQuantity").value = "";
+    } catch (error) {
 
-        loadIngredients();
+        console.error("Error adding ingredient:", error);
 
-    } else {
-
-        alert("Failed to add ingredient.");
     }
 }
 
 
 async function loadIngredients() {
 
-    const response = await fetch(API + "/ingredients");
-
-    const ingredients = await response.json();
-
     const list = document.getElementById("ingredientList");
 
-    list.innerHTML = "";
+    // Immediately clear old data
+    list.innerHTML = "<p>Refreshing...</p>";
 
-    ingredients.forEach(ingredient => {
+    try {
 
-        list.innerHTML += `
+        const response =
+            await fetch("/ingredients?time=" + Date.now());
 
-            <div class="item">
+        if (!response.ok) {
+            throw new Error("Unable to load ingredients");
+        }
 
-                <h4>${ingredient.name}</h4>
+        const ingredients = await response.json();
 
-                <p><b>ID:</b> ${ingredient.id}</p>
+        list.innerHTML = "";
 
-                <p><b>Quantity:</b>
-                    ${ingredient.quantity}
-                </p>
+        if (ingredients.length === 0) {
 
-                <button
-                    class="delete-btn"
-                    onclick="deleteIngredient(${ingredient.id})">
-                    Delete
-                </button>
+            list.innerHTML =
+                "<p>No ingredients found.</p>";
 
-            </div>
-        `;
-    });
+            return;
+        }
+
+        ingredients.forEach(ingredient => {
+
+            list.innerHTML += `
+                <div class="item">
+
+                    <h4>${ingredient.name}</h4>
+
+                    <p>
+                        <b>ID:</b> ${ingredient.id}
+                    </p>
+
+                    <p>
+                        <b>Quantity:</b> ${ingredient.quantity}
+                    </p>
+
+                    <button
+                        class="delete-btn"
+                        onclick="deleteIngredient(${ingredient.id})">
+                        Delete
+                    </button>
+
+                </div>
+            `;
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        list.innerHTML =
+            "<p>Unable to refresh ingredients.</p>";
+    }
 }
 
 
 async function deleteIngredient(id) {
 
-    await fetch(API + "/ingredients/" + id, {
+    try {
 
-        method: "DELETE"
-    });
+        const response =
+            await fetch("/ingredients/" + id, {
+                method: "DELETE"
+            });
 
-    loadIngredients();
+        if (response.ok) {
+            loadIngredients();
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Error deleting ingredient:",
+            error
+        );
+
+    }
 }
 
 
-/* =========================
-   USERS
-========================= */
+// ======================================================
+// USER
+// ======================================================
 
 async function addUser() {
 
     const user = {
-
         name: document.getElementById("userName").value,
-
         email: document.getElementById("userEmail").value
     };
 
-    const response = await fetch(API + "/users", {
+    try {
 
-        method: "POST",
+        const response = await fetch("/users", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(user)
+        });
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+        if (response.ok) {
 
-        body: JSON.stringify(user)
-    });
+            // Clear form
+            document.getElementById("userName").value = "";
+            document.getElementById("userEmail").value = "";
 
-    if (response.ok) {
+            // Refresh list
+            loadUsers();
 
-        alert("User added successfully!");
+        } else {
+            console.error("Failed to add user.");
+        }
 
-        document.getElementById("userName").value = "";
-        document.getElementById("userEmail").value = "";
+    } catch (error) {
 
-        loadUsers();
+        console.error("Error adding user:", error);
 
-    } else {
-
-        alert("Failed to add user.");
     }
 }
 
 
 async function loadUsers() {
 
-    const response = await fetch(API + "/users");
-
-    const users = await response.json();
-
     const list = document.getElementById("userList");
 
-    list.innerHTML = "";
+    // Immediately clear old data
+    list.innerHTML = "<p>Refreshing...</p>";
 
-    users.forEach(user => {
+    try {
 
-        list.innerHTML += `
+        const response =
+            await fetch("/users?time=" + Date.now());
 
-            <div class="item">
+        if (!response.ok) {
+            throw new Error("Unable to load users");
+        }
 
-                <h4>${user.name}</h4>
+        const users = await response.json();
 
-                <p><b>ID:</b> ${user.id}</p>
+        list.innerHTML = "";
 
-                <p><b>Email:</b> ${user.email}</p>
+        if (users.length === 0) {
 
-                <button
-                    class="delete-btn"
-                    onclick="deleteUser(${user.id})">
-                    Delete
-                </button>
+            list.innerHTML =
+                "<p>No users found.</p>";
 
-            </div>
-        `;
-    });
+            return;
+        }
+
+        users.forEach(user => {
+
+            list.innerHTML += `
+                <div class="item">
+
+                    <h4>${user.name}</h4>
+
+                    <p>
+                        <b>ID:</b> ${user.id}
+                    </p>
+
+                    <p>
+                        <b>Email:</b> ${user.email}
+                    </p>
+
+                    <button
+                        class="delete-btn"
+                        onclick="deleteUser(${user.id})">
+                        Delete
+                    </button>
+
+                </div>
+            `;
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        list.innerHTML =
+            "<p>Unable to refresh users.</p>";
+    }
 }
 
 
 async function deleteUser(id) {
 
-    await fetch(API + "/users/" + id, {
+    try {
 
-        method: "DELETE"
-    });
+        const response =
+            await fetch("/users/" + id, {
+                method: "DELETE"
+            });
 
-    loadUsers();
+        if (response.ok) {
+            loadUsers();
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Error deleting user:",
+            error
+        );
+
+    }
 }
 
 
-/* =========================
-   MEAL PLANS
-========================= */
+// ======================================================
+// MEAL PLAN
+// ======================================================
 
 async function addMealPlan() {
 
     const mealPlan = {
 
         userId:
-            Number(document.getElementById("mealUserId").value),
+            Number(
+                document.getElementById("mealUserId").value
+            ),
 
         recipeId:
-            Number(document.getElementById("mealRecipeId").value),
+            Number(
+                document.getElementById("mealRecipeId").value
+            ),
 
         mealDate:
             document.getElementById("mealDate").value
     };
 
-    const response = await fetch(API + "/mealplans", {
+    try {
 
-        method: "POST",
+        const response =
+            await fetch("/mealplans", {
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+                method: "POST",
 
-        body: JSON.stringify(mealPlan)
-    });
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-    if (response.ok) {
+                body: JSON.stringify(mealPlan)
 
-        alert("Meal plan added successfully!");
+            });
 
-        loadMealPlans();
+        if (response.ok) {
 
-    } else {
+            // Clear form
+            document.getElementById("mealUserId").value = "";
+            document.getElementById("mealRecipeId").value = "";
+            document.getElementById("mealDate").value = "";
 
-        alert("Failed to add meal plan.");
+            // Refresh list
+            loadMealPlans();
+
+        } else {
+            console.error("Failed to add meal plan.");
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Error adding meal plan:",
+            error
+        );
+
     }
 }
 
 
 async function loadMealPlans() {
 
-    const response = await fetch(API + "/mealplans");
+    const list =
+        document.getElementById("mealPlanList");
 
-    const mealPlans = await response.json();
+    // Immediately clear old data
+    list.innerHTML = "<p>Refreshing...</p>";
 
-    const list = document.getElementById("mealPlanList");
+    try {
 
-    list.innerHTML = "";
+        const response =
+            await fetch(
+                "/mealplans?time=" + Date.now()
+            );
 
-    mealPlans.forEach(plan => {
+        if (!response.ok) {
+            throw new Error(
+                "Unable to load meal plans"
+            );
+        }
 
-        list.innerHTML += `
+        const mealPlans =
+            await response.json();
 
-            <div class="item">
+        list.innerHTML = "";
 
-                <h4>Meal Plan #${plan.id}</h4>
+        if (mealPlans.length === 0) {
 
-                <p><b>User ID:</b>
-                    ${plan.userId}
-                </p>
+            list.innerHTML =
+                "<p>No meal plans found.</p>";
 
-                <p><b>Recipe ID:</b>
-                    ${plan.recipeId}
-                </p>
+            return;
+        }
 
-                <p><b>Date:</b>
-                    ${plan.mealDate}
-                </p>
+        mealPlans.forEach(plan => {
 
-                <button
-                    class="delete-btn"
-                    onclick="deleteMealPlan(${plan.id})">
-                    Delete
-                </button>
+            list.innerHTML += `
+                <div class="item">
 
-            </div>
-        `;
-    });
+                    <h4>
+                        Meal Plan #${plan.id}
+                    </h4>
+
+                    <p>
+                        <b>User ID:</b>
+                        ${plan.userId}
+                    </p>
+
+                    <p>
+                        <b>Recipe ID:</b>
+                        ${plan.recipeId}
+                    </p>
+
+                    <p>
+                        <b>Date:</b>
+                        ${plan.mealDate}
+                    </p>
+
+                    <button
+                        class="delete-btn"
+                        onclick="deleteMealPlan(${plan.id})">
+                        Delete
+                    </button>
+
+                </div>
+            `;
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        list.innerHTML =
+            "<p>Unable to refresh meal plans.</p>";
+    }
 }
 
 
 async function deleteMealPlan(id) {
 
-    await fetch(API + "/mealplans/" + id, {
+    try {
 
-        method: "DELETE"
-    });
+        const response =
+            await fetch(
+                "/mealplans/" + id,
+                {
+                    method: "DELETE"
+                }
+            );
 
-    loadMealPlans();
+        if (response.ok) {
+            loadMealPlans();
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Error deleting meal plan:",
+            error
+        );
+
+    }
 }
 
 
-/* =========================
-   LOAD DATA WHEN PAGE OPENS
-========================= */
+// ======================================================
+// PAGE LOAD
+// ======================================================
 
-window.onload = function() {
+window.addEventListener("load", function () {
 
     loadRecipes();
 
@@ -390,4 +574,5 @@ window.onload = function() {
     loadUsers();
 
     loadMealPlans();
-};
+
+});
